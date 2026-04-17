@@ -7,6 +7,7 @@ Agente de IA para el asistente financiero personal **finanzIA**, construido con 
 Procesa mensajes del usuario y ejecuta herramientas para gestionar transacciones e ingresos/gastos personales contra un backend Java.
 
 **Herramientas disponibles:**
+
 - `get_categories` / `create_category` / `update_category` / `delete_category`
 - `get_transactions` / `create_transaction` / `get_transaction_detail`
 

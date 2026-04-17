@@ -50,11 +50,20 @@ export const agent = createAgent({
   tools,
   name: "financial_agent",
   stateSchema: z.object({
-    token: z.string().optional().describe("JWT token for backend authentication"),
+    token: z
+      .string()
+      .optional()
+      .describe("JWT token for backend authentication"),
   }),
   contextSchema: z.object({
-    userName: z.string().optional().describe("Display name of the authenticated user"),
-    token: z.string().optional().describe("JWT token for backend authentication"),
+    userName: z
+      .string()
+      .optional()
+      .describe("Display name of the authenticated user"),
+    token: z
+      .string()
+      .optional()
+      .describe("JWT token for backend authentication"),
   }),
   middleware: [
     tokenMiddleware,

@@ -22,7 +22,9 @@ export const createCategory = tool(
     if (!res.ok) {
       const text = await res.text();
       console.error(`[create_category] error ${res.status}:`, text);
-      return JSON.stringify({ error: `Failed to create category: ${res.status} — ${text}` });
+      return JSON.stringify({
+        error: `Failed to create category: ${res.status} — ${text}`,
+      });
     }
 
     const data = await res.json();
@@ -44,7 +46,10 @@ Example call: { "name": "Gym", "description": "Monthly membership and sports exp
       type: z
         .enum(["INCOME", "EXPENSE", "BOTH"])
         .describe("Category type: INCOME, EXPENSE, or BOTH"),
-      color: z.string().optional().describe("Optional hex color code, e.g. #FF5733"),
+      color: z
+        .string()
+        .optional()
+        .describe("Optional hex color code, e.g. #FF5733"),
       icon: z.string().optional().describe("Optional icon name or emoji"),
     }),
   },

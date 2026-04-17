@@ -23,7 +23,10 @@ export const getTransactionDetail = tool(
     }
 
     const data = await res.json();
-    console.log("[get_transaction_detail] response:", JSON.stringify(data, null, 2));
+    console.log(
+      "[get_transaction_detail] response:",
+      JSON.stringify(data, null, 2),
+    );
     return JSON.stringify(data);
   },
   {

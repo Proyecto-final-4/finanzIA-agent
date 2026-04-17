@@ -18,7 +18,9 @@ export const deleteCategory = tool(
     if (!res.ok) {
       const text = await res.text();
       console.error(`[delete_category] error ${res.status}:`, text);
-      return JSON.stringify({ error: `Failed to delete category ${id}: ${res.status} — ${text}` });
+      return JSON.stringify({
+        error: `Failed to delete category ${id}: ${res.status} — ${text}`,
+      });
     }
 
     console.log(`[delete_category] category ${id} deleted successfully`);

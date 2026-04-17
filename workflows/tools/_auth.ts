@@ -16,9 +16,8 @@ export function extractToken(config: RunnableConfig | undefined): string {
   const ctx = (config as Record<string, unknown> | undefined)?.context as
     | Record<string, unknown>
     | undefined;
-  const taskInput = (cfg?.__pregel_scratchpad as Record<string, unknown>)?.currentTaskInput as
-    | Record<string, unknown>
-    | undefined;
+  const taskInput = (cfg?.__pregel_scratchpad as Record<string, unknown>)
+    ?.currentTaskInput as Record<string, unknown> | undefined;
 
   const token =
     (cfg?.token as string | undefined) ??

@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@eslint/js": "^9",
     "eslint": "^9",
     "prettier": "^3.8.1",
     "typescript": "^5"

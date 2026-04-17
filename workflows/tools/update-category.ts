@@ -8,7 +8,10 @@ export const updateCategory = tool(
 
     const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
 
-    console.log("[update_category] payload:", JSON.stringify({ id, ...body }, null, 2));
+    console.log(
+      "[update_category] payload:",
+      JSON.stringify({ id, ...body }, null, 2),
+    );
 
     const res = await fetch(`${endpoint}/categories/${id}`, {
       method: "PUT",
@@ -22,7 +25,9 @@ export const updateCategory = tool(
     if (!res.ok) {
       const text = await res.text();
       console.error(`[update_category] error ${res.status}:`, text);
-      return JSON.stringify({ error: `Failed to update category ${id}: ${res.status} — ${text}` });
+      return JSON.stringify({
+        error: `Failed to update category ${id}: ${res.status} — ${text}`,
+      });
     }
 
     const data = await res.json();
@@ -42,7 +47,10 @@ Example call: { "id": "a1b2c3d4-...", "name": "Food & Groceries" }
     schema: z.object({
       id: z.string().uuid().describe("UUID of the category to update"),
       name: z.string().optional().describe("New name for the category"),
-      description: z.string().optional().describe("New description for the category"),
+      description: z
+        .string()
+        .optional()
+        .describe("New description for the category"),
     }),
   },
 );

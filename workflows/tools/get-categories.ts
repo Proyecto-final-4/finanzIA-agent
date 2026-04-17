@@ -19,7 +19,9 @@ export const getCategories = tool(
     if (!res.ok) {
       const text = await res.text();
       console.error(`[get_categories] error ${res.status}:`, text);
-      return JSON.stringify({ error: `Failed to fetch categories: ${res.status} — ${text}` });
+      return JSON.stringify({
+        error: `Failed to fetch categories: ${res.status} — ${text}`,
+      });
     }
 
     const data = await res.json();

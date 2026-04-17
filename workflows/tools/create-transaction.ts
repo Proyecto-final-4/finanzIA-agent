@@ -7,7 +7,10 @@ export const createTransaction = tool(
     const token = extractToken(config);
 
     const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-    console.log("[create_transaction] payload:", JSON.stringify(input, null, 2));
+    console.log(
+      "[create_transaction] payload:",
+      JSON.stringify(input, null, 2),
+    );
 
     const res = await fetch(`${endpoint}/transactions`, {
       method: "POST",
@@ -21,11 +24,16 @@ export const createTransaction = tool(
     if (!res.ok) {
       const text = await res.text();
       console.error(`[create_transaction] error ${res.status}:`, text);
-      return JSON.stringify({ error: `Failed to create transaction: ${res.status} — ${text}` });
+      return JSON.stringify({
+        error: `Failed to create transaction: ${res.status} — ${text}`,
+      });
     }
 
     const data = await res.json();
-    console.log("[create_transaction] response:", JSON.stringify(data, null, 2));
+    console.log(
+      "[create_transaction] response:",
+      JSON.stringify(data, null, 2),
+    );
     return JSON.stringify(data);
   },
   {
@@ -53,9 +61,17 @@ Example call:
 }
 `.trim(),
     schema: z.object({
-      categoryId: z.string().uuid().describe("UUID of the category for this transaction"),
-      amount: z.number().positive().describe("Transaction amount (positive number)"),
-      type: z.enum(["INCOME", "EXPENSE"]).describe("INCOME or EXPENSE — infer from context"),
+      categoryId: z
+        .string()
+        .uuid()
+        .describe("UUID of the category for this transaction"),
+      amount: z
+        .number()
+        .positive()
+        .describe("Transaction amount (positive number)"),
+      type: z
+        .enum(["INCOME", "EXPENSE"])
+        .describe("INCOME or EXPENSE — infer from context"),
       transactionDate: z.string().describe("Date in YYYY-MM-DD format"),
       description: z.string().describe("Short description of the transaction"),
       notes: z.string().optional().describe("Optional additional notes"),

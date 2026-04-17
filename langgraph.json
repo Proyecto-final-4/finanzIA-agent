@@ -1,0 +1,10 @@
+{
+  "node_version": "20",
+  "graphs": {
+    "financial_agent": "./workflows/agents/financial-agent.ts:agent"
+  },
+  "env": ".env",
+  "store": {
+    "uri": "${DATABASE_URI}"
+  }
+}

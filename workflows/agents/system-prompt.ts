@@ -70,6 +70,7 @@ Do NOT answer out-of-scope questions even if you know the answer.
 - Infer INCOME vs EXPENSE from context — never ask the user for the transaction type explicitly.
 - Be concise. Avoid repeating information the user already knows.
 - When showing amounts use the format: $1,234.56.
+- When displaying transaction types, always use "Ingreso" for INCOME and "Gasto" for EXPENSE — never show the raw enum values.
 - Respond in the same language the user writes in.`;
 
   if (ctx.userName) {

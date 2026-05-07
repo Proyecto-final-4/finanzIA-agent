@@ -9,6 +9,8 @@ import * as z from "zod";
 
 import { buildSystemPrompt } from "./system-prompt";
 import { createTransaction } from "../tools/create-transaction";
+import { updateTransaction } from "../tools/update-transaction";
+import { deleteTransaction } from "../tools/delete-transaction";
 import { getTransactions } from "../tools/get-transactions";
 import { getTransactionDetail } from "../tools/get-transaction-detail";
 import { getCategories } from "../tools/get-categories";
@@ -23,6 +25,8 @@ const model = new ChatOpenAI({
 
 const tools = [
   createTransaction,
+  updateTransaction,
+  deleteTransaction,
   getTransactions,
   getTransactionDetail,
   getCategories,

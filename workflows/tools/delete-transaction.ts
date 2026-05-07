@@ -7,7 +7,10 @@ export const deleteTransaction = tool(
     const token = extractToken(config);
 
     const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-    console.log("[delete_transaction] payload:", JSON.stringify({ id }, null, 2));
+    console.log(
+      "[delete_transaction] payload:",
+      JSON.stringify({ id }, null, 2),
+    );
 
     const res = await fetch(`${endpoint}/transactions/${id}`, {
       method: "DELETE",

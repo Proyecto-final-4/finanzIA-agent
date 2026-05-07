@@ -13,6 +13,8 @@ import { updateTransaction } from "../tools/update-transaction";
 import { deleteTransaction } from "../tools/delete-transaction";
 import { getTransactions } from "../tools/get-transactions";
 import { getTransactionDetail } from "../tools/get-transaction-detail";
+import { getSummary } from "../tools/get-summary";
+import { ragSearch } from "../tools/rag-search";
 import { getCategories } from "../tools/get-categories";
 import { createCategory } from "../tools/create-category";
 import { updateCategory } from "../tools/update-category";
@@ -29,6 +31,8 @@ const tools = [
   deleteTransaction,
   getTransactions,
   getTransactionDetail,
+  getSummary,
+  ragSearch,
   getCategories,
   createCategory,
   updateCategory,

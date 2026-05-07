@@ -9,14 +9,30 @@ export const ragSearch = tool(
 
     console.log("[rag_search] payload:", JSON.stringify(input, null, 2));
 
-    const res = await fetch(`${endpoint}/rag/search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(input),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+
+    let res: Response;
+    try {
+      res = await fetch(`${endpoint}/rag/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      clearTimeout(timeout);
+      const msg =
+        err instanceof Error && err.name === "AbortError"
+          ? "rag_search timed out after 10 seconds"
+          : String(err);
+      console.error("[rag_search] fetch error:", msg);
+      return JSON.stringify({ error: msg });
+    }
+    clearTimeout(timeout);
 
     if (!res.ok) {
       const text = await res.text();

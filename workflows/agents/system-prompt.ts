@@ -65,17 +65,15 @@ When the user asks "¿puedo comprar X?", "¿qué pasa si gasto $X en Y?", or sim
 
 ## Subscription & redundancy detection
 
-When doing financial analysis or when the user asks about recurring expenses:
-1. Use rag_search with queries like "Netflix", "Spotify", "streaming", "suscripción" to find recurring service charges.
+Only trigger this when the user explicitly mentions subscriptions, streaming, or recurring charges (e.g. "tengo muchas suscripciones", "¿estoy pagando servicios que no uso?", "revisa mis suscripciones").
+Do NOT call rag_search automatically for generic savings or analysis questions — use get_summary for those.
+
+When triggered:
+1. Use rag_search with queries like "Netflix", "Spotify", "streaming", "suscripción" to find recurring charges.
 2. If you find multiple streaming or similar services, flag it:
-   "Veo que pagas [servicio A] y [servicio B] — ¿los usas ambos activamente? Eliminar uno te ahorraría $X al mes."
+   "Veo que pagas [servicio A] y [servicio B] — ¿los usas ambos? Eliminar uno te ahorraría $X al mes."
 3. If you find what looks like a duplicate charge (same amount, same description, close dates), alert the user:
    "Noto dos cobros de $X de [nombre] en un período corto — ¿fue intencional?"
-
-Trigger this check proactively when:
-- The user asks for recommendations
-- The user asks for a spending overview
-- The user asks "en qué puedo ahorrar"
 
 ---
 

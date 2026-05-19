@@ -8,17 +8,12 @@ import { ChatOpenAI } from "@langchain/openai";
 import * as z from "zod";
 
 import { buildSystemPrompt } from "./system-prompt";
-import { createTransaction } from "../tools/create-transaction";
-import { updateTransaction } from "../tools/update-transaction";
-import { deleteTransaction } from "../tools/delete-transaction";
-import { getTransactions } from "../tools/get-transactions";
-import { getTransactionDetail } from "../tools/get-transaction-detail";
 import { getSummary } from "../tools/get-summary";
+import { getTrends } from "../tools/get-trends";
 import { ragSearch } from "../tools/rag-search";
-import { getCategories } from "../tools/get-categories";
-import { createCategory } from "../tools/create-category";
-import { updateCategory } from "../tools/update-category";
-import { deleteCategory } from "../tools/delete-category";
+import { transactionsTool } from "./transactions-agent";
+import { budgetsTool } from "./budgets-agent";
+import { goalsTool } from "./goals-agent";
 
 const model = new ChatOpenAI({
   model: "gpt-5.4-mini-2026-03-17",
@@ -26,17 +21,12 @@ const model = new ChatOpenAI({
 });
 
 const tools = [
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-  getTransactions,
-  getTransactionDetail,
   getSummary,
+  getTrends,
   ragSearch,
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  transactionsTool,
+  budgetsTool,
+  goalsTool,
 ];
 
 /**

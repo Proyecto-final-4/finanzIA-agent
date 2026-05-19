@@ -33,14 +33,23 @@ export const getSummary = tool(
   {
     name: "get_summary",
     description: `
-Returns a financial summary for the user: total income, total expenses, balance, and a breakdown by category.
+Returns a financial summary for the user.
+
+Response shape (do not expect byCategory):
+- totalIncome, totalExpense, balance
+- savingsRate: fraction of income saved (balance / income); cite when asked about saving habits
+- incomeByCategory: array of { categoryId, categoryName, total, percentage } for income
+- expenseByCategory: same structure for expenses; use percentage for "what share of spending is X?"
 
 Use this tool when the user asks for:
 - An overview of their finances
 - How much they spent or earned in a period
-- Which categories they spend the most on
+- Top spending or earning categories (expenseByCategory / incomeByCategory)
+- Savings rate or how efficiently they are saving
 - Recommendations or analysis based on their spending
 - Whether they can afford something or how to save more
+
+For period-over-period comparisons, use get_trends instead.
 
 Optionally filter by date range. Defaults to all time if no range is given.
 Prefer filtering to the current month for recent analysis.

@@ -1,4 +1,4 @@
-import { createAgent, tool } from "langchain";
+import { tool } from "@langchain/core/tools";
 import { ChatOpenAI } from "@langchain/openai";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import * as z from "zod";
@@ -8,6 +8,8 @@ import { getGoals } from "../tools/get-goals";
 import { createGoal } from "../tools/create-goal";
 import { updateGoal } from "../tools/update-goal";
 import { deleteGoal } from "../tools/delete-goal";
+import { createSpecialistAgent } from "./_agent-factory";
+import { formatAgentReply } from "./_format-reply";
 
 const model = new ChatOpenAI({
   model: "gpt-5.4-mini-2026-03-17",
@@ -29,11 +31,11 @@ Rules:
 
 const goalTools = [getGoals, createGoal, updateGoal, deleteGoal];
 
-export const goalsAgent = createAgent({
-  model,
-  tools: goalTools,
+export const goalsAgent = createSpecialistAgent({
   name: "goals_agent",
+  tools: goalTools,
   systemPrompt: GOALS_SYSTEM_PROMPT,
+  model,
   contextSchema: z.object({
     token: z
       .string()
@@ -43,11 +45,12 @@ export const goalsAgent = createAgent({
 });
 
 /**
- * Delegates savings-goal work to goals_agent. The coordinator invokes this tool
- * when the conversation involves savings goals, progress toward objectives, etc.
+ * Delegates savings-goals work to goals_agent.
+ * The coordinator invokes this tool when the conversation involves
+ * savings goals, progress toward objectives, etc.
  */
 export const goalsTool = tool(
-  async ({ request }, config) => {
+  async ({ request }, config: RunnableConfig | undefined) => {
     const token = extractToken(config);
 
     const subConfig: RunnableConfig = {
@@ -59,23 +62,13 @@ export const goalsTool = tool(
       subConfig,
     );
 
-    const lastMessage = result.messages.at(-1);
-    const content = lastMessage?.content;
-
-    if (typeof content === "string") return content;
-    if (Array.isArray(content)) {
-      return content
-        .map((block) =>
-          typeof block === "string"
-            ? block
-            : "text" in block
-              ? String(block.text)
-              : JSON.stringify(block),
-        )
-        .join("\n");
-    }
-
-    return JSON.stringify(content ?? result);
+    // Se pasa result como nullFallback para reproducir el comportamiento
+    // original: si content es null/undefined, serializar el resultado completo
+    return formatAgentReply(
+      result.messages,
+      "Goals sub-agent returned no response.",
+      result,
+    );
   },
   {
     name: "goals_agent",

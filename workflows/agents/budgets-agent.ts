@@ -1,6 +1,6 @@
 import { tool } from "@langchain/core/tools";
-import { createAgent } from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
+import type { RunnableConfig } from "@langchain/core/runnables";
 import * as z from "zod";
 
 import { extractToken } from "../tools/_auth";
@@ -9,6 +9,8 @@ import { createBudget } from "../tools/create-budget";
 import { updateBudget } from "../tools/update-budget";
 import { deleteBudget } from "../tools/delete-budget";
 import { getBudgetStatus } from "../tools/get-budget-status";
+import { createSpecialistAgent } from "./_agent-factory";
+import { formatAgentReply } from "./_format-reply";
 
 const model = new ChatOpenAI({
   model: "gpt-5.4-mini-2026-03-17",
@@ -43,11 +45,11 @@ Rules:
 - If the query starts with [USER_CONFIRMED], execute create/update/delete operations without asking for confirmation.
 `.trim();
 
-export const budgetsAgent = createAgent({
-  model,
-  tools: budgetTools,
+export const budgetsAgent = createSpecialistAgent({
   name: "budgets_agent",
+  tools: budgetTools,
   systemPrompt: BUDGETS_AGENT_PROMPT,
+  model,
   contextSchema: z.object({
     token: z
       .string()
@@ -56,32 +58,13 @@ export const budgetsAgent = createAgent({
   }),
 });
 
-function formatAgentReply(messages: { content: unknown }[]): string {
-  const last = messages.at(-1);
-  if (!last) return "Budgets sub-agent returned no response.";
-
-  const { content } = last;
-  if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content
-      .map((block) => {
-        if (typeof block === "string") return block;
-        if (block && typeof block === "object" && "text" in block) {
-          return String((block as { text: unknown }).text);
-        }
-        return JSON.stringify(block);
-      })
-      .join("\n");
-  }
-  return JSON.stringify(content);
-}
-
 /**
- * Tool wrapper so the financial coordinator can delegate budget tasks.
- * Equivalent to createAgentAsTool — propagates JWT via configurable.
+ * Tool wrapper para que el coordinador financiero delegue tareas
+ * de presupuestos al agente especialista.
+ * Equivalente a createAgentAsTool — propaga el JWT vía configurable.
  */
 export const budgetsTool = tool(
-  async ({ query }, config) => {
+  async ({ query }, config: RunnableConfig | undefined) => {
     const token = extractToken(config);
 
     const result = await budgetsAgent.invoke(
@@ -89,7 +72,10 @@ export const budgetsTool = tool(
       { configurable: { token } },
     );
 
-    return formatAgentReply(result.messages);
+    return formatAgentReply(
+      result.messages,
+      "Budgets sub-agent returned no response.",
+    );
   },
   {
     name: "budgets_agent",

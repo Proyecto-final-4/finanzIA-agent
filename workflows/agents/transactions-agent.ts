@@ -1,5 +1,4 @@
 import { tool } from "@langchain/core/tools";
-import { createAgent } from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
 import type { RunnableConfig } from "@langchain/core/runnables";
 import * as z from "zod";
@@ -14,6 +13,8 @@ import { getCategories } from "../tools/get-categories";
 import { createCategory } from "../tools/create-category";
 import { updateCategory } from "../tools/update-category";
 import { deleteCategory } from "../tools/delete-category";
+import { createSpecialistAgent } from "./_agent-factory";
+import { formatAgentReply } from "./_format-reply";
 
 const model = new ChatOpenAI({
   model: "gpt-5.4-mini-2026-03-17",
@@ -84,11 +85,11 @@ Do NOT ask the user to confirm again — doing so creates a frustrating confirma
 - Respond in the same language the user writes in.
 `.trim();
 
-export const transactionsAgent = createAgent({
-  model,
-  tools: transactionTools,
+export const transactionsAgent = createSpecialistAgent({
   name: "transactions_agent",
+  tools: transactionTools,
   systemPrompt: TRANSACTIONS_AGENT_PROMPT,
+  model,
   contextSchema: z.object({
     token: z
       .string()
@@ -97,31 +98,12 @@ export const transactionsAgent = createAgent({
   }),
 });
 
-function formatAgentReply(messages: { content: unknown }[]): string {
-  const last = messages.at(-1);
-  if (!last) return "Transactions sub-agent returned no response.";
-
-  const { content } = last;
-  if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content
-      .map((block) => {
-        if (typeof block === "string") return block;
-        if (block && typeof block === "object" && "text" in block) {
-          return String((block as { text: unknown }).text);
-        }
-        return JSON.stringify(block);
-      })
-      .join("\n");
-  }
-  return JSON.stringify(content);
-}
-
 /**
- * Tool wrapper so the financial coordinator can delegate transaction and category tasks.
+ * Tool wrapper para que el coordinador financiero delegue tareas
+ * de transacciones y categorías al agente especialista.
  */
 export const transactionsTool = tool(
-  async ({ query }, config) => {
+  async ({ query }, config: RunnableConfig | undefined) => {
     const token = extractToken(config);
 
     const subConfig: RunnableConfig = {
@@ -133,7 +115,10 @@ export const transactionsTool = tool(
       subConfig,
     );
 
-    return formatAgentReply(result.messages);
+    return formatAgentReply(
+      result.messages,
+      "Transactions sub-agent returned no response.",
+    );
   },
   {
     name: "transactions_agent",

@@ -58,7 +58,7 @@ export const budgetsAgent = createAgent({
 
 function formatAgentReply(messages: { content: unknown }[]): string {
   const last = messages.at(-1);
-  if (!last) return "El sub-agente de presupuestos no devolvió respuesta.";
+  if (!last) return "Budgets sub-agent returned no response.";
 
   const { content } = last;
   if (typeof content === "string") return content;
@@ -94,7 +94,7 @@ export const budgetsTool = tool(
   {
     name: "budgets_agent",
     description: `
-Delegates to the budgets specialist. Use when the user talks about presupuestos, spending limits,
+Delegates to the budgets specialist. Use when the user talks about budgets, spending limits,
 how much they have left in a category, creating/updating/deleting budgets, or comparing spending vs a limit.
 
 Pass a clear query with category names, amounts, periods, and any budget ids already known.

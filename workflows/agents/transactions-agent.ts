@@ -99,7 +99,7 @@ export const transactionsAgent = createAgent({
 
 function formatAgentReply(messages: { content: unknown }[]): string {
   const last = messages.at(-1);
-  if (!last) return "El sub-agente de transacciones no devolvió respuesta.";
+  if (!last) return "Transactions sub-agent returned no response.";
 
   const { content } = last;
   if (typeof content === "string") return content;

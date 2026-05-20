@@ -44,7 +44,7 @@ export const goalsAgent = createAgent({
 
 /**
  * Delegates savings-goal work to goals_agent. The coordinator invokes this tool
- * when the conversation involves metas de ahorro, progreso hacia objetivos, etc.
+ * when the conversation involves savings goals, progress toward objectives, etc.
  */
 export const goalsTool = tool(
   async ({ request }, config) => {

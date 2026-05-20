@@ -51,11 +51,7 @@ Example call:
 `.trim(),
     schema: z.object({
       id: z.string().uuid().describe("UUID of the budget to update"),
-      categoryId: z
-        .string()
-        .uuid()
-        .optional()
-        .describe("New category UUID"),
+      categoryId: z.string().uuid().optional().describe("New category UUID"),
       amountLimit: z
         .number()
         .positive()

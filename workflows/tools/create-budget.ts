@@ -62,9 +62,7 @@ Example call:
       period: z
         .enum(["DAILY", "WEEKLY", "MONTHLY"])
         .describe("Budget period: DAILY, WEEKLY, or MONTHLY"),
-      startDate: z
-        .string()
-        .describe("Budget start date in YYYY-MM-DD format"),
+      startDate: z.string().describe("Budget start date in YYYY-MM-DD format"),
       endDate: z
         .string()
         .optional()

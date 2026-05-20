@@ -24,10 +24,7 @@ export const getBudgetStatus = tool(
     }
 
     const data = await res.json();
-    console.log(
-      "[get_budget_status] response:",
-      JSON.stringify(data, null, 2),
-    );
+    console.log("[get_budget_status] response:", JSON.stringify(data, null, 2));
     return JSON.stringify(data);
   },
   {

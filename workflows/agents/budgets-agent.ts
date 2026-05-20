@@ -36,9 +36,11 @@ Your tools:
 Rules:
 - Call get_budgets before create/update/delete when you need ids or to avoid duplicates.
 - For progress questions ("how am I doing", "how much left"), use get_budget_status after resolving the budget id.
-- categoryId must be a valid UUID; if missing, say what you need — do not invent ids.
-- Use amounts and dates exactly as the user provides; default startDate to today only when reasonable.
+- categoryId must be a valid UUID. The coordinator is responsible for resolving category names to UUIDs before delegating.
+  If the categoryId is missing from the query, do NOT ask the user — return a message to the coordinator stating which category name needs its UUID resolved.
+- Use amounts and dates exactly as the query provides; default startDate to today only when reasonable.
 - Return a concise summary with numbers (spent, remaining, percentage) when reporting status.
+- If the query starts with [USER_CONFIRMED], execute create/update/delete operations without asking for confirmation.
 `.trim();
 
 export const budgetsAgent = createAgent({

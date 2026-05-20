@@ -1,44 +1,9 @@
-import { tool } from "@langchain/core/tools";
 import * as z from "zod";
-import { extractToken } from "./_auth";
+import { defineBackendTool } from "./_http-client";
 
-export const updateTransaction = tool(
-  async ({ id, ...fields }, config) => {
-    const token = extractToken(config);
-
-    const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-    console.log(
-      "[update_transaction] payload:",
-      JSON.stringify({ id, ...fields }, null, 2),
-    );
-
-    const res = await fetch(`${endpoint}/transactions/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(fields),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[update_transaction] error ${res.status}:`, text);
-      return JSON.stringify({
-        error: `Failed to update transaction: ${res.status} — ${text}`,
-      });
-    }
-
-    const data = await res.json();
-    console.log(
-      "[update_transaction] response:",
-      JSON.stringify(data, null, 2),
-    );
-    return JSON.stringify(data);
-  },
-  {
-    name: "update_transaction",
-    description: `
+export const updateTransaction = defineBackendTool({
+  name: "update_transaction",
+  description: `
 Updates an existing transaction. Only the fields provided will be changed.
 
 Pre-steps:
@@ -59,21 +24,24 @@ Example call:
   "description": "Updated description"
 }
 `.trim(),
-    schema: z.object({
-      id: z.string().uuid().describe("UUID of the transaction to update"),
-      categoryId: z
-        .string()
-        .uuid()
-        .optional()
-        .describe("New category UUID — must come from get_categories"),
-      amount: z.number().positive().optional().describe("New amount"),
-      type: z.enum(["INCOME", "EXPENSE"]).optional().describe("New type"),
-      transactionDate: z
-        .string()
-        .optional()
-        .describe("New date in YYYY-MM-DD format"),
-      description: z.string().optional().describe("New description"),
-      notes: z.string().optional().describe("New notes"),
-    }),
-  },
-);
+  schema: z.object({
+    id: z.string().uuid().describe("UUID of the transaction to update"),
+    categoryId: z
+      .string()
+      .uuid()
+      .optional()
+      .describe("New category UUID — must come from get_categories"),
+    amount: z.number().positive().optional().describe("New amount"),
+    type: z.enum(["INCOME", "EXPENSE"]).optional().describe("New type"),
+    transactionDate: z
+      .string()
+      .optional()
+      .describe("New date in YYYY-MM-DD format"),
+    description: z.string().optional().describe("New description"),
+    notes: z.string().optional().describe("New notes"),
+  }),
+  method: "PUT",
+  buildPath: (input) => `/transactions/${input.id}`,
+  // Send fields without id (id is already in the URL)
+  buildBody: ({ id: _id, ...fields }) => fields,
+});

@@ -1,38 +1,9 @@
-import { tool } from "@langchain/core/tools";
 import * as z from "zod";
-import { extractToken } from "./_auth";
+import { defineBackendTool } from "./_http-client";
 
-export const getSummary = tool(
-  async (input, config) => {
-    const token = extractToken(config);
-    const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-
-    const params = new URLSearchParams();
-    if (input.from) params.set("from", input.from);
-    if (input.to) params.set("to", input.to);
-
-    const url = `${endpoint}/summary?${params.toString()}`;
-    console.log("[get_summary] url:", url);
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[get_summary] error ${res.status}:`, text);
-      return JSON.stringify({
-        error: `Failed to fetch summary: ${res.status} — ${text}`,
-      });
-    }
-
-    const data = await res.json();
-    console.log("[get_summary] response:", JSON.stringify(data, null, 2));
-    return JSON.stringify(data);
-  },
-  {
-    name: "get_summary",
-    description: `
+export const getSummary = defineBackendTool({
+  name: "get_summary",
+  description: `
 Returns a financial summary for the user.
 
 Response shape (do not expect byCategory):
@@ -58,9 +29,16 @@ Example calls:
 - Current month: { "from": "2026-05-01", "to": "2026-05-31" }
 - All time: {}
 `.trim(),
-    schema: z.object({
-      from: z.string().optional().describe("Start date in YYYY-MM-DD format"),
-      to: z.string().optional().describe("End date in YYYY-MM-DD format"),
-    }),
+  schema: z.object({
+    from: z.string().optional().describe("Start date in YYYY-MM-DD format"),
+    to: z.string().optional().describe("End date in YYYY-MM-DD format"),
+  }),
+  method: "GET",
+  // Construye la URL con query params opcionales de rango de fechas
+  buildPath: (input) => {
+    const params = new URLSearchParams();
+    if (input.from) params.set("from", input.from);
+    if (input.to) params.set("to", input.to);
+    return `/summary?${params.toString()}`;
   },
-);
+});

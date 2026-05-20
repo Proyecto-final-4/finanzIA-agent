@@ -1,39 +1,9 @@
-import { tool } from "@langchain/core/tools";
 import * as z from "zod";
-import { extractToken } from "./_auth";
+import { defineBackendTool } from "./_http-client";
 
-export const createBudget = tool(
-  async (input, config) => {
-    const token = extractToken(config);
-
-    const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-
-    console.log("[create_budget] payload:", JSON.stringify(input, null, 2));
-
-    const res = await fetch(`${endpoint}/budgets`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(input),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[create_budget] error ${res.status}:`, text);
-      return JSON.stringify({
-        error: `Failed to create budget: ${res.status} — ${text}`,
-      });
-    }
-
-    const data = await res.json();
-    console.log("[create_budget] response:", JSON.stringify(data, null, 2));
-    return JSON.stringify(data);
-  },
-  {
-    name: "create_budget",
-    description: `
+export const createBudget = defineBackendTool({
+  name: "create_budget",
+  description: `
 Creates a new spending budget for a category.
 
 REQUIRED: categoryId (UUID), amountLimit (positive number), period (DAILY/WEEKLY/MONTHLY), startDate (YYYY-MM-DD).
@@ -50,27 +20,29 @@ Example call:
   "startDate": "2026-05-01"
 }
 `.trim(),
-    schema: z.object({
-      categoryId: z
-        .string()
-        .uuid()
-        .describe("UUID of the category this budget applies to"),
-      amountLimit: z
-        .number()
-        .positive()
-        .describe("Maximum amount allowed for the budget period"),
-      period: z
-        .enum(["DAILY", "WEEKLY", "MONTHLY"])
-        .describe("Budget period: DAILY, WEEKLY, or MONTHLY"),
-      startDate: z.string().describe("Budget start date in YYYY-MM-DD format"),
-      endDate: z
-        .string()
-        .optional()
-        .describe("Optional end date in YYYY-MM-DD format"),
-      isActive: z
-        .boolean()
-        .optional()
-        .describe("Whether the budget is active (default true)"),
-    }),
-  },
-);
+  schema: z.object({
+    categoryId: z
+      .string()
+      .uuid()
+      .describe("UUID of the category this budget applies to"),
+    amountLimit: z
+      .number()
+      .positive()
+      .describe("Maximum amount allowed for the budget period"),
+    period: z
+      .enum(["DAILY", "WEEKLY", "MONTHLY"])
+      .describe("Budget period: DAILY, WEEKLY, or MONTHLY"),
+    startDate: z.string().describe("Budget start date in YYYY-MM-DD format"),
+    endDate: z
+      .string()
+      .optional()
+      .describe("Optional end date in YYYY-MM-DD format"),
+    isActive: z
+      .boolean()
+      .optional()
+      .describe("Whether the budget is active (default true)"),
+  }),
+  method: "POST",
+  buildPath: () => "/budgets",
+  buildBody: (input) => input,
+});

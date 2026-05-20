@@ -1,35 +1,9 @@
-import { tool } from "@langchain/core/tools";
 import * as z from "zod";
-import { extractToken } from "./_auth";
+import { defineBackendTool } from "./_http-client";
 
-export const getGoals = tool(
-  async (_input, config) => {
-    const token = extractToken(config);
-
-    const endpoint = process.env.BACKEND_JAVA_ENDPOINT;
-    const url = `${endpoint}/goals`;
-
-    console.log("[get_goals] url:", url);
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[get_goals] error ${res.status}:`, text);
-      return JSON.stringify({
-        error: `Failed to fetch goals: ${res.status} — ${text}`,
-      });
-    }
-
-    const data = await res.json();
-    console.log("[get_goals] response:", JSON.stringify(data, null, 2));
-    return JSON.stringify(data);
-  },
-  {
-    name: "get_goals",
-    description: `
+export const getGoals = defineBackendTool({
+  name: "get_goals",
+  description: `
 Returns all savings goals for the authenticated user.
 
 ALWAYS call this before update_goal or delete_goal to obtain the correct goal UUID.
@@ -47,6 +21,7 @@ Example response:
   }
 ]
 `.trim(),
-    schema: z.object({}),
-  },
-);
+  schema: z.object({}),
+  method: "GET",
+  buildPath: () => "/goals",
+});

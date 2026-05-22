@@ -13,7 +13,7 @@ import { createSpecialistAgent } from "./_agent-factory";
 import { formatAgentReply } from "./_format-reply";
 
 const model = new ChatOpenAI({
-  model: "gpt-5.4-mini-2026-03-17",
+  model: "gpt-5.5-2026-04-23",
   temperature: 0,
 });
 

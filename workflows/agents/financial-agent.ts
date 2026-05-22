@@ -17,7 +17,6 @@ import { goalsTool } from "./goals-agent";
 
 const model = new ChatOpenAI({
   model: "gpt-5.5-2026-04-23",
-  temperature: 0,
 });
 
 const tools = [

@@ -13,7 +13,6 @@ import { formatAgentReply } from "./_format-reply";
 
 const model = new ChatOpenAI({
   model: "gpt-5.5-2026-04-23",
-  temperature: 0,
 });
 
 const GOALS_SYSTEM_PROMPT = `
